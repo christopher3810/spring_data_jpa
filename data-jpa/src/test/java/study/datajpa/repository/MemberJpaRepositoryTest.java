@@ -1,6 +1,6 @@
 package study.datajpa.repository;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -70,6 +70,18 @@ class MemberJpaRepositoryTest {
         assertThat(result.get(0).getUsername()).isEqualTo("AAA");
         assertThat(result.get(0).getAge()).isEqualTo(20);
         assertThat(result.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void testMemberQuery(){
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member ("AAA", 20);
+        memberJpaRepository.save(m1);
+        memberJpaRepository.save(m2);
+
+        List<Member> result = memberJpaRepository.findByUsername("AAA");
+        Member findMember = result.get(0);
+        assertThat(findMember).isEqualTo(m1);
     }
 
 }
