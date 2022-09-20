@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,6 +148,29 @@ class MemberRepositoryTest {
         for (Member member : result) {
             System.out.println("member = " + member);
         }
+    }
+
+    @Test
+    public void returnType(){
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member ("BBB", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        List<Member> aaa = memberRepository.findListByUsername("AAA");
+        assertThat(aaa.get(0).getUsername()).isEqualTo(m1.getUsername());
+        Member bbb = memberRepository.findMemberByUsername("BBB");
+        assertThat(bbb.getUsername()).isEqualTo(m2.getUsername());
+        Optional<Member> ccc = memberRepository.findOptionalByUsername("AAA");
+        assertThat(ccc.isPresent()).isEqualTo(true);
+        assertThat(ccc.get().getUsername()).isEqualTo(m1.getUsername());
+
+        //동작방식에 빈컬렉션을 제공하고 null을 반환하지 않기 때문에 null check를 할 필요가 없다.
+        List<Member> dfkdfkdjfdkjfkd = memberRepository.findListByUsername("dfkdfkdjfdkjfkd");
+        System.out.println("dfkdfkdjfdkjfkd.size() = " + dfkdfkdjfdkjfkd.size());
+        //단일 반환 값의 경우 Null 반환함
+        //Member nullMember = memberRepository.findMemberByUsername("dfkdfkdjfdkjfkd");
+
     }
 
 }
