@@ -3,6 +3,9 @@ package study.datajpa.repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +18,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     List<Member> findTop3HelloBy();
 
-    @Query(name = "Member.findByUsername") //없애도 잘 동작함
+    @Query(name = "Member.findByUsername")
+        //없애도 잘 동작함
     List<Member> findByUsername(@Param("username") String username);
 
     @Query("select m from Member m where m.username = :username and m.age = :age")
@@ -30,10 +34,24 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<MemberDto> findMemberDto();
 
     @Query("select m from Member m where m.username in :names")
-    List<Member> findByNames(@Param("names") Collection<String> names); //Collection으로 두고 좀더 받을 범주를 열어준다.
+    List<Member> findByNames(
+        @Param("names") Collection<String> names); //Collection으로 두고 좀더 받을 범주를 열어준다.
 
     //반환 타입을 유연하게 활용가능
     List<Member> findListByUsername(String username); // 컬렉션으로 받기
+
     Member findMemberByUsername(String username); //단건으로 받기
+
     Optional<Member> findOptionalByUsername(String username); //단건인데 타입을 optional 로 받기
+
+    //    Slice<Member> findByAge(int age, Pageable pageable);
+    //반환 값을 List로 받아도 됨
+//    List<Member> findByAge(int age, Pageable pageable);
+
+    @Query(value = "select m from Member m")
+    Page<Member> findByAge(int age, Pageable pageable);
+
+    // 카운트 쿼리 분리
+    // @Query(value = "select m from Member m left join m.team t", countQuery = "select count(m) from Member m")
+    // Page<Member> findByAge(int age, Pageable pageable);
 }
