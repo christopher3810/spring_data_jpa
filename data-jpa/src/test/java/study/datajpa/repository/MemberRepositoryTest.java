@@ -6,9 +6,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -172,5 +176,52 @@ class MemberRepositoryTest {
         //Member nullMember = memberRepository.findMemberByUsername("dfkdfkdjfdkjfkd");
 
     }
+
+    @Test
+    public void paging(){
+
+        //given - 이런 데이터 있을떄
+        memberRepository.save(new Member("member1",10));
+        memberRepository.save(new Member("member2",10));
+        memberRepository.save(new Member("member3",10));
+        memberRepository.save(new Member("member4",10));
+        memberRepository.save(new Member("member5",10));
+
+        int age = 10;
+        //0 페이지에서 3개 가져옴 소팅은 desc
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Direction.DESC, "username"));
+
+        //when - 이렇게 하면
+        //반환타입이 page면 total count를 이미 쿼리로 보냄 반환타입에 따라서 total count 여부 정할 수 있음
+        Page<Member> page = memberRepository.findByAge(age, pageRequest);
+
+        Page<MemberDto> map = page.map(
+            member -> new MemberDto(member.getId(), member.getUsername(), null));
+
+        List<Member> content = page.getContent();
+//        long totalElements = page.getTotalElements();
+
+        for (Member member : content) {
+            System.out.println("member = " + member);
+        }
+
+//        System.out.println("totalElements = " + totalElements);
+
+        //페이지 계산 공식
+        //totalPage = totalCount / size ...
+        //마지막 페이지 ...
+        //최초 페에지...
+        //Spring Data Jpa에 이미 제공
+
+        //then
+        assertThat(content.size()).isEqualTo(3);
+        assertThat(page.getTotalElements()).isEqualTo(5);
+        assertThat(page.getNumber()).isEqualTo(0);
+        assertThat(page.getTotalPages()).isEqualTo(2);
+        assertThat(page.isFirst()).isTrue();
+        assertThat(page.hasNext()).isTrue();
+
+    }
+
 
 }
