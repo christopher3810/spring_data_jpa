@@ -45,11 +45,11 @@ public class MemberJpaRepository {
         return em.createQuery(
                 "select m from Member m where m.username = :username and m.age > :age")
             .setParameter("username", username)
-            .setParameter("age",age)
+            .setParameter("age", age)
             .getResultList();
     }
 
-    public List<Member> findByUsername(String username){
+    public List<Member> findByUsername(String username) {
         return em.createNamedQuery("Member.findByUsername", Member.class)
             .setParameter("username", "회원1")
             .getResultList();
@@ -64,9 +64,18 @@ public class MemberJpaRepository {
             .getResultList();
     }
 
-    public Long totalCount(int age){
+    public Long totalCount(int age) {
         return em.createQuery("select count(m) from Member m where m.age = :age", Long.class)
-            .setParameter("age",age)
+            .setParameter("age", age)
             .getSingleResult();
     }
+
+    public int bulkAgePlus(int age) {
+        return em.createQuery(
+                "update Member m set m.age = m.age + 1 where m.age >= :age")
+            .setParameter("age", age)
+            .executeUpdate();
+    }
+    //순수 jpa 벌크 수정 쿼리 생성
+    //cmd + option + n -> inline
 }
