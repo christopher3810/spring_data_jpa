@@ -7,6 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedQuery;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -19,6 +21,7 @@ import lombok.NoArgsConstructor;
     name="Member.findByUsername",
     query="select m from Member m where m.username = :username"
 )
+@NamedEntityGraph(name = "Member.all", attributeNodes = @NamedAttributeNode("team"))
 public class Member {
 
     @Id @GeneratedValue
@@ -27,7 +30,7 @@ public class Member {
     private String username;
     private int age;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) //지연로딩 Member만 조회를 하면 당연히 Team을 조회하지 않고 사용시점에 조회
     @JoinColumn(name = "team_id")
     private Team team;
 
