@@ -278,4 +278,30 @@ class MemberRepositoryTest {
 
     }
 
+    @Test
+    public void queryHint(){
+        //given
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush(); //flush시 1차캐시에 값이 지워지진 않기 떄문에 남아있고
+        em.clear(); //clear시점에서 날라가지
+
+        //when
+//        Member findMember = memberRepository.findById(member1.getId()).get();
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");
+        findMember.setUsername("member2");
+
+        em.flush(); //변경감지는 결국 원본 데이터가 존재해야함 데이터가 두개를 가지고 있어야함 비교를 해야 하기 때문
+    }
+
+    @Test
+    public void lock(){
+        //given
+        Member member1 = memberRepository.save(new Member("member1", 10));
+        em.flush(); //flush시 1차캐시에 값이 지워지진 않기 떄문에 남아있고
+        em.clear(); //clear시점에서 날라가지
+
+        //when
+        List<Member> member11 = memberRepository.findLockByUsername("member1");
+    }
+
 }
